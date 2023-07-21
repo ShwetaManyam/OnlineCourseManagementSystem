@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            background-image: url('login.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .container {
+            margin: 100px auto;
+            width: 400px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4285F4;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3277D6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login Page</h1>
+        <form>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <button type="button" onclick="login()">Login</button>
+        </form>
+    </div>
+
+    <script>
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            if (username === "admin" && password === "admin") {
+                window.location.href = "admin.html";
+            } else {
+                alert("Invalid username or password. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>
