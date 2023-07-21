@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>B-tree Visualization</title>
+  <style>
+    svg {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div id="btree"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // Course code entered by the admin
+    var courseCode = "CSCI123";
+
+    // B-tree data structure
+    class BTNode {
+      constructor(key) {
+        this.key = key;
+        this.children = [];
+      }
+    }
+
+    // B-tree visualization function
+    function visualizeBTree(courseCode) {
+      // Create a root node with the course code
+      var rootNode = new BTNode(courseCode);
+
+      // Determine the number of levels in the tree based on the length of the course code
+      var levels = Math.ceil(Math.log2(courseCode.length));
+
+      // Generate child nodes for each level
+      for (var i = 0; i < levels; i++) {
+        var parentNode = rootNode;
+
+        // Generate child nodes based on the current level
+        for (var j = 0; j < parentNode.children.length; j++) {
+          var childNode = parentNode.children[j];
+
+          // Generate child nodes for the next level
+          for (var k = 0; k < 2; k++) {
+            var key = childNode.key + (k === 0 ? "0" : "1");
+            childNode.children.push(new BTNode(key));
+          }
+        }
+      }
+
+      // Create an SVG container for the visualization
+      var svg = d3.select("#btree")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%");
+
+      // Calculate the width and height of each node based on the number of levels
+      var nodeWidth = 100 / Math.pow(2, levels);
+      var nodeHeight = 100 / levels;
+
+      // Traverse the B-tree and render the nodes
+      function traverse(node, x, y) {
+        svg.append("rect")
+          .attr("x", x + "%")
+          .attr("y", y + "%")
+          .attr("width", nodeWidth + "%")
+          .attr("height", nodeHeight + "%")
+          .attr("fill", "#e9e9e9")
+          .attr("stroke", "#333333");
+
+        svg.append("text")
+          .attr("x", x + nodeWidth / 2 + "%")
+          .attr("y", y + nodeHeight / 2 + "%")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .text(node.key);
+
+        // Recursively traverse child nodes
+        for (var i = 0; i < node.children.length; i++) {
+          var childNode = node.children[i];
+          var childX = x + (i * nodeWidth);
+          var childY = y + nodeHeight;
+
+          traverse(childNode, childX, childY);
+        }
+      }
+
+      // Start the traversal from the root node
+      traverse(rootNode, 0, 0);
+    }
+
+    // Call the visualization function with the provided course code
+    visualizeBTree(courseCode);
+  </script>
+</body>
+</html>

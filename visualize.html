@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>B-tree Visualization</title>
+  <style>
+    #btree-container {
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      margin: 0 auto;
+      overflow: auto;
+      width: 960px;
+      height: 600px;
+    }
+    
+    .node circle {
+      fill: #fff;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+
+    .node text {
+      font: 12px sans-serif;
+      text-anchor: middle;
+    }
+
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 1.5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>B-tree Visualization</h1>
+  <div id="btree-container"></div>
+
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script>
+    // Define the BTree class
+    class BTree {
+      constructor(order) {
+        this.order = order;
+        this.root = new BTreeNode(order);
+      }
+
+      insert(key) {
+        let root = this.root;
+        if (root.isFull()) {
+          let newRoot = new BTreeNode(this.order);
+          newRoot.children.push(root);
+          this.root = newRoot;
+          root.splitChild(0);
+          root = newRoot;
+        }
+        root.insert(key);
+      }
+
+      print() {
+        this.traverse(this.root);
+      }
+
+      traverse(node) {
+        if (node) {
+          for (let i = 0; i < node.keys.length; i++) {
+            this.traverse(node.children[i]);
+            console.log(node.keys[i]);
+          }
+          this.traverse(node.children[node.keys.length]);
+        }
+      }
+    }
+
+    // Define the BTreeNode class
+    class BTreeNode {
+      constructor(order) {
+        this.order = order;
+        this.keys = [];
+        this.children = [];
+      }
+
+      isLeaf() {
+        return this.children.length === 0;
+      }
+
+      isFull() {
+        return this.keys.length === 2 * this.order - 1;
+      }
+
+      splitChild(index) {
+        const order = this.order;
+        const child = this.children[index];
+        const newChild = new BTreeNode(order);
+
+        // Move the median key to the parent node
+        const median = child.keys[order - 1];
+        this.keys.splice(index, 0, median);
+
+        // Move the right half of keys to the new child node
+        newChild.keys = child.keys.splice(order, order - 1);
+
+        // Move the right half of children to the new child node
+        if (!child.isLeaf()) {
+          newChild.children = child.children.splice(order, order);
+        }
+
+        // Insert the new child into the parent node
+        this.children.splice(index + 1, 0, newChild);
+      }
+
+      insert(key) {
+        let index = this.keys.length - 1;
+        if (this.isLeaf()) {
+          while (index >= 0 && key < this.keys[index]) {
+            index--;
+          }
+          this.keys.splice(index + 1, 0, key);
+        } else {
+          while (index >= 0 && key < this.keys[index]) {
+            index--;
+          }
+          index++;
+          if (this.children[index].isFull()) {
+            this.splitChild(index);
+            if (key > this.keys[index]) {
+              index++;
+            }
+          }
+          this.children[index].insert(key);
+        }
+      }
+    }
+
+    // Create a B-tree instance
+    const btree = new BTree(3);
+
+    // Insert keys into the B-tree
+    btree.insert(8);
+    btree.insert(5);
+    btree.insert(2);
+    btree.insert(9);
+    btree.insert(15);
+    btree.insert(1);
+    btree.insert(12);
+    btree.insert(4);
+    btree.insert(6);
+    btree.insert(3);
+    btree.insert(11);
+    btree.insert(7);
+    btree.insert(10);
+    btree.insert(14);
+    btree.insert(13);
+
+    // Visualization using D3.js
+    const container = d3.select("#btree-container");
+    const width = +container.style("width").replace("px", "");
+    const height = +container.style("height").replace("px", "");
+    const svg = container
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    const g = svg.append("g");
+
+    const treeLayout = d3.tree().size([width, height]);
+
+    const root = d3.hierarchy(btree.root);
+    treeLayout(root);
+
+    const link = g
+      .selectAll(".link")
+      .data(root.links())
+      .enter()
+      .append("path")
+      .attr("class", "link")
+      .attr("d", d3.linkHorizontal()
+        .x(d => d.y)
+        .y(d => d.x));
+
+    const node = g
+      .selectAll(".node")
+      .data(root.descendants())
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr("transform", d => `translate(${d.y},${d.x})`);
+
+    node.append("circle")
+      .attr("r", 10);
+
+    node.append("text")
+      .attr("dy", 5)
+      .attr("x", d => d.children ? -13 : 13)
+      .attr("text-anchor", d => d.children ? "end" : "start")
+      .text(d => d.data.keys.join(", "));
+  </script>
+</body>
+</html>

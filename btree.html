@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>B-Tree Construction</title>
+  <style>
+    /* Your CSS styles for the B-tree visualization */
+    .node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 5px;
+    }
+    .leaf-node {
+      background-color: lightblue;
+    }
+  </style>
+</head>
+<body>
+  <h1>B-Tree Construction</h1>
+  <div id="btree-output">
+    <h3>Constructed B-Tree</h3>
+  </div>
+
+  <script>
+    class BTreeNode {
+  constructor(t) {
+    this.t = t;
+    this.keys = [];
+    this.children = [];
+    this.leaf = true;
+  }
+
+  insert(key) {
+    if (this.keys.length === 2 * this.t - 1) {
+      const newChild = new BTreeNode(this.t);
+      newChild.children = this.children.splice(this.t);
+      newChild.keys = this.keys.splice(this.t - 1);
+
+      const newRoot = new BTreeNode(this.t);
+      newRoot.children.push(this);
+      newRoot.children.push(newChild);
+      newRoot.keys.push(newChild.keys[0]);
+
+      this.keys = [this.keys[this.t - 1]];
+      this.children = [newRoot];
+      this.leaf = false;
+      this.insertNonFull(key);
+    } else {
+      this.insertNonFull(key);
+    }
+  }
+
+  insertNonFull(key) {
+    let i = this.keys.length - 1;
+
+    if (this.leaf) {
+      while (i >= 0 && key < this.keys[i]) {
+        this.keys[i + 1] = this.keys[i];
+        i--;
+      }
+      this.keys[i + 1] = key;
+    } else {
+      while (i >= 0 && key < this.keys[i]) {
+        i--;
+      }
+
+      if (this.children[i + 1].keys.length === 2 * this.t - 1) {
+        this.splitChild(i + 1);
+        if (key > this.keys[i + 1]) {
+          i++;
+        }
+      }
+      this.children[i + 1].insertNonFull(key);
+    }
+  }
+
+  splitChild(index) {
+    const child = this.children[index];
+    const newChild = new BTreeNode(this.t);
+
+    this.keys.splice(index, 0, child.keys[this.t - 1]);
+    this.children.splice(index + 1, 0, newChild);
+
+    newChild.keys = child.keys.splice(this.t);
+    if (!child.leaf) {
+      newChild.children = child.children.splice(this.t);
+    }
+  }
+
+  toHTML() {
+    const nodeDiv = document.createElement('div');
+    nodeDiv.classList.add('node');
+    if (this.leaf) {
+      nodeDiv.classList.add('leaf-node');
+    }
+
+    const keysDiv = document.createElement('div');
+    keysDiv.textContent = `Keys: ${this.keys.join(', ')}`;
+    nodeDiv.appendChild(keysDiv);
+
+    const childrenDiv = document.createElement('div');
+    childrenDiv.textContent = `Children: ${this.children.length}`;
+    nodeDiv.appendChild(childrenDiv);
+
+    for (let i = 0; i < this.children.length; i++) {
+      const childHTML = this.children[i].toHTML();
+      nodeDiv.appendChild(childHTML);
+    }
+
+    return nodeDiv;
+  }
+}
+
+    function getCourseCodeFromQuery() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const courseCode = urlParams.get('code');
+      return courseCode;
+    }
+
+    function constructBTree(courseCode) {
+      const btree = new BTreeNode(3);
+      btree.insert(courseCode);
+      return btree;
+    }
+
+    const courseCode = getCourseCodeFromQuery();
+    const btree = constructBTree(courseCode);
+
+    const btreeOutput = document.querySelector('#btree-output');
+    btreeOutput.appendChild(btree.toHTML());
+  </script>
+</body>
+</html>
