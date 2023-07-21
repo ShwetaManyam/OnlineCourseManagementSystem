@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Online Course Management - Admin Page</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background-image: url('admin.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    h1 {
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    textarea,
+    input[type="number"] {
+      width: 50%;
+      padding: 6px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 80px;
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
+
+    .course-details {
+      margin-bottom: 20px;
+    }
+
+    .course-details h4 {
+      font-family: cursive;
+      margin-bottom: 5px;
+    }
+
+    .course-details p {
+      margin-bottom: 5px;
+    }
+
+    .course-details a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .course-details a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 style="font-family: cursive;">Online Course Management - Admin Page</h1>
+  </div>
+  
+  <div class="container">
+    <h2 style="font-family: cursive; text-align: center;">Welcome, Admin!</h2>
+
+    <div style="background-image: url('istockphoto-1210048255-612x612.png'); background-position: center; background-size: cover; background-repeat: no-repeat;">
+      <br>
+      <h2 style="text-align: center;">Enter course details to be added here :-)</h2>
+      <br>
+      <div>
+        <label for="courseName"><h4>Course Name : <input type="text" id="courseName" required></h4></label>
+      </div>
+      
+      <div>
+        <label for="courseCode"><h4>Course Code : <input type="text" id="courseCode" required></h4></label>
+        
+      </div>
+      
+      <div>
+        <label for="courseDescription"><h4>Description : &nbsp;&nbsp;&nbsp;<textarea id="courseDescription" rows="2" required></textarea></h4></label>
+        
+      </div>
+
+      <div>
+        <label for="courseWebsite"><h4>Website : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="courseWebsite" required></h4></label>
+        
+      </div>
+ 
+      <div>
+        <label for="coursePrice"><h4>Price : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" id="coursePrice" required></h4></label>
+        
+      </div>
+    </div>
+    <br>
+    <div class="button-container">
+      <button onclick="addCourse()">Add Course</button>
+      <button id="saveButton">Save</button>
+    </div>  
+    <div class="button-container">
+      <button onclick="generateDownloadLink()">Download course details</button>
+    </div>  
+   
+    <div id="courseList">Course List:</div>
+
+
+
+    <script>
+      function addCourse() {
+        var courseNameInput = document.getElementById("courseName");
+        var courseCodeInput = document.getElementById("courseCode");
+        var courseDescriptionInput = document.getElementById("courseDescription");
+        var courseWebsiteInput = document.getElementById("courseWebsite");
+        var coursePriceInput = document.getElementById("coursePrice");
+
+        var courseName = courseNameInput.value;
+        var courseCode = courseCodeInput.value;
+        var courseDescription = courseDescriptionInput.value;
+        var courseWebsite = courseWebsiteInput.value;
+        var coursePrice = coursePriceInput.value;
+
+        if (courseName.trim() !== "" && courseCode.trim() !== "" && courseDescription.trim() !== "" && courseWebsite.trim() !== "" && coursePrice.trim() !== "") {
+          // Create a new course object
+          var newCourse = {
+            name: courseName,
+            code: courseCode,
+            description: courseDescription,
+            website: courseWebsite,
+            price: coursePrice
+          };
+
+          // Get the courses from local storage
+          var courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+          // Add the new course to the array
+          courses.push(newCourse);
+
+          // Save the updated courses back to local storage
+          localStorage.setItem("courses", JSON.stringify(courses));
+
+          // Display the updated course list
+          displayCourses();
+
+          // Clear the input fields
+          courseNameInput.value = "";
+          courseCodeInput.value = "";
+          courseDescriptionInput.value = "";
+          courseWebsiteInput.value = "";
+          coursePriceInput.value = "";
+        }
+      }
+
+      function deleteCourse(index) {
+        // Get the courses from local storage
+        var courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+        // Remove the course at the specified index
+        courses.splice(index, 1);
+
+        // Save the updated courses back to local storage
+        localStorage.setItem("courses", JSON.stringify(courses));
+
+        // Display the updated course list
+        displayCourses();
+      }
+      
+      function editCourse(index) {
+  // Get the courses from local storage
+  var courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+  // Get the course at the specified index
+  var course = courses[index];
+
+  // Set the input fields with the course data
+  var courseNameInput = document.getElementById("courseName");
+  var courseCodeInput = document.getElementById("courseCode");
+  var courseDescriptionInput = document.getElementById("courseDescription");
+  var courseWebsiteInput = document.getElementById("courseWebsite");
+  var coursePriceInput = document.getElementById("coursePrice");
+
+  courseNameInput.value = course.name;
+  courseCodeInput.value = course.code;
+  courseDescriptionInput.value = course.description;
+  courseWebsiteInput.value = course.website;
+  coursePriceInput.value = course.price;
+
+  // Save the index of the edited course
+  var editedCourseIndex = index;
+
+  // Update the course when the "Save" button is clicked
+  document.getElementById("saveButton").onclick = function() {
+    // Update the course properties
+    course.name = courseNameInput.value;
+    course.code = courseCodeInput.value;
+    course.description = courseDescriptionInput.value;
+    course.website = courseWebsiteInput.value;
+    course.price = coursePriceInput.value;
+
+    // Save the updated courses back to local storage
+    localStorage.setItem("courses", JSON.stringify(courses));
+
+    // Display the updated course list
+    displayCourses();
+
+    // Reset the input fields
+    courseNameInput.value = "";
+    courseCodeInput.value = "";
+    courseDescriptionInput.value = "";
+    courseWebsiteInput.value = "";
+    coursePriceInput.value = "";
+
+    // Remove the "Save" button click listener
+    document.getElementById("saveButton").onclick = addCourse;
+  };
+
+  // Display the updated course list
+  displayCourses();
+}
+      function displayCourses() {
+        var courseListDiv = document.getElementById("courseList");
+        courseListDiv.innerHTML = "";
+
+        // Get the courses from local storage
+        var courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+        courses.forEach(function(course, index) {
+          var courseDetails = document.createElement("div");
+          courseDetails.innerHTML = `
+          <hr>
+            <h4>${course.name} (${course.code})</h4>
+            <p>${course.description}</p>
+            <p>Website: <a href="${course.website}" target="_blank">${course.website}</a></p>
+            <p>Price: ${course.price}</p>
+            <div class="button-container">
+              <button onclick="editCourse(${index})">Edit</button>
+              <button onclick="deleteCourse(${index})">Delete</button>
+            </div>
+            <hr>
+          `;
+          courseListDiv.appendChild(courseDetails);
+        });
+      }
+
+      // Call the displayCourses function when the admin page loads
+      window.addEventListener("load", displayCourses);
+
+      function generateDownloadLink() {
+        // Get the courses from local storage
+        var courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+        // Construct the data string to be written to the file
+        var data = courses.map(course => `${course.code}`).join("\n");
+
+        // Create a blob with the data
+        var blob = new Blob([data], { type: "text/plain" });
+
+        // Create a download link element
+        var downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = "courseData.txt";
+        downloadLink.innerHTML = "Download";
+
+        // Append the download link to the document body
+        document.body.appendChild(downloadLink);
+
+        // Programmatically click the download link to trigger the download
+        downloadLink.click();
+
+        // Remove the download link from the document body
+        document.body.removeChild(downloadLink);
+      }
+    </script>
+  </div>
+</body>
+</html>
