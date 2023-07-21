@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Online Course Management - User Page</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('user.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    .header {
+      color: #000000;
+      padding: 20px;
+      text-align: center;
+      font-size: larger;
+    }
+    h1 {
+      margin: 0;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .admin-link {
+      text-align: right;
+      margin-top: 20px;
+    }
+    .admin-link button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #000000;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f7f7f7;
+      background-image: url('pastel.jpg');
+      font-size: medium;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    #courseDetailsContainer {
+      margin-top: 20px;
+    }
+    h3 {
+      margin: 0 0 10px;
+    }
+    #courseDetails p {
+      margin: 0 0 5px;
+    }
+    #courseDetails a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    #courseDetails a:hover {
+      text-decoration: underline;
+    }
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .button-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Online Course Management - User Page</h1>
+  </div>
+  <div class="admin-link">
+    <button onclick="redirectToLogin()">Admin Login</button>
+  </div>
+  <div class="container">
+    <form>
+      <div class="form-group">
+        <label for="courseSelect">Select Course:</label>
+        <select id="courseSelect">
+          <option value="">Select a course...</option>
+          <!-- Options will be added dynamically using JavaScript -->
+        </select>
+      </div>
+    </form>
+    <div id="courseDetailsContainer">
+      <h3>Course Details</h3>
+      <div id="courseDetails"></div>
+    </div>
+
+    <script>
+      function redirectToLogin() {
+        window.location.href = "login.html";
+      }
+
+      function populateDropdown() {
+        var courseSelect = document.getElementById("courseSelect");
+        // Get the courses from local storage
+        var courses = JSON.parse(localStorage.getItem("courses")) || [];
+        // Populate the dropdown with the courses
+        courses.forEach(function(course) {
+          var option = document.createElement("option");
+          option.value = course.name; // Use course name as the option value
+          option.textContent = course.name; // Display course name in the dropdown
+          courseSelect.appendChild(option);
+        });
+      }
+
+      function displayCourseDetails() {
+        var courseSelect = document.getElementById("courseSelect");
+        var selectedCourse = courseSelect.value;
+        var courseDetailsDiv = document.getElementById("courseDetails");
+
+        // Get the courses from local storage
+        var courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+        // Find the selected course by name
+        var course = courses.find(function(course) {
+          return course.name === selectedCourse;
+        });
+
+        // Clear the previous course details
+        courseDetailsDiv.innerHTML = "";
+
+        // Display the course details if a course is selected
+        if (course) {
+          var courseInfo = document.createElement("div");
+          courseInfo.innerHTML = `
+            <p><strong>Course Name:</strong> ${course.name}</p>
+            <p><strong>Course Code:</strong> ${course.code}</p>
+            <p><strong>Description:</strong> ${course.description}</p>
+            <p><strong>Website:</strong> <a href="${course.website}" target="_blank">${course.website}</a></p>
+            <p><strong>Price:</strong> ${course.price}</p>
+          `;
+          courseDetailsDiv.appendChild(courseInfo);
+        }
+      }
+
+      // Call the necessary functions when the user page loads
+      window.addEventListener("load", function() {
+        populateDropdown();
+        displayCourseDetails();
+      });
+
+      // Add an event listener to the courseSelect dropdown to trigger displayCourseDetails
+      var courseSelect = document.getElementById("courseSelect");
+      courseSelect.addEventListener("change", displayCourseDetails);
+    </script>
+  </div>
+</body>
+</html>
